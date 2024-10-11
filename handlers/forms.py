@@ -1,4 +1,5 @@
-# Написать форму для помощи юзеру
+from aiogram.fsm.state import State, StatesGroup
 
-class SupportForm():
-    pass
+class SupportForm(StatesGroup):
+    ticket_type = State()
+    ticket_text = State()

@@ -12,14 +12,14 @@ class User(Base):
     username: Mapped[str] = mapped_column(String, nullable=True)
     first_name: Mapped[str] = mapped_column(String, nullable=False)
 
-    themes: Mapped[list["Ticket"]] = relationship(back_populates='user')
+    ticket: Mapped[list["Ticket"]] = relationship(back_populates='user')
 
 class Ticket(Base):
     __tablename__ = 'tickets'
 
     # Описание основных полей для тикетов
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
-    user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey('users.telegram_id'))
+    user_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
     ticket_type: Mapped[str] = mapped_column(String, nullable=False)
     ticket_text: Mapped[str] = mapped_column(String, nullable=False)
 
