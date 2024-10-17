@@ -81,39 +81,42 @@ async def get_type_ticket(call: CallbackQuery, state: FSMContext):
 # Функция по написания отзыва о проблеме
 @user_router.callback_query(F.data.startswith('sup_'), SupportForm.ticket_type)
 async def get_text_ticket(call: CallbackQuery, state: FSMContext):
-       await call.answer()
-       problem_type = await call.data.split('sup_')[1]
-       await state.update_data(ticket_type=problem_type)
-       
-       text = f'Тип вашей проблемы: {problem_type}\n\n'\
+    await call.answer()
+    problem_type = call.data.split('sup_')[1]
+    await state.update_data(ticket_type=problem_type)
+    
+    text = f'Тип вашей проблемы: {problem_type}\n\n'\
               f'Теперь опишите свою проблему:'
-       
-       await call.message.edit_caption(text=text)
+    
+    await state.set_state(SupportForm.ticket_text)
+
+    await call.message.answer(text=text)
+
 
 # Функция по выбору сохранить или нет
-@user_router.callback_query(SupportForm.ticket_text)
+@user_router.message(F.text, SupportForm.ticket_text)
 async def accept_or_cancle_problem(message: Message, state: FSMContext):
-       problem_text = await message.text
-       message.delete
-       await state.update_data(ticket_text=problem_text)
+    problem_text = message.text
+    await state.update_data(ticket_text=problem_text)
        
-       problem_data = state.get_data()
+    problem_data = await state.get_data()
 
-       text = f'Тип вашей проблемы: {problem_data.get('ticket_type')}\n\n'\
-              f'Текст вашей проблемы:\n{problem_data.get('ticket_text')}'
+    text = f'Тип вашей проблемы: {problem_data.get('ticket_type')}\n\n'\
+            f'Текст вашей проблемы:\n{problem_data.get('ticket_text')}'
        
-       await message.edit_caption(text=text, reply_markup=accept_or_cancle_kb())
+    await message.answer(text=text, reply_markup=accept_or_cancle_kb())
 
-@user_router.callback_query(F.data == 'accept')
+@user_router.callback_query(F.data == 'accept', SupportForm.ticket_text)
 async def accept_problem(call: CallbackQuery, state: FSMContext):
-    problem_data = state.get_data()
+    problem_data = await state.get_data()
     await call.answer('Ваше сообщение отправленно')
     await TicketDAO.add(
         user_id=call.from_user.id,
+        username=call.from_user.username,
         ticket_type=problem_data.get('ticket_type'),
-        ticket_data=problem_data.get('ticket_text')
+        ticket_text=problem_data.get('ticket_text')
     )
-
+    await call.message.delete()
 
 
 @user_router.callback_query(F.data == 'cancle')
@@ -121,7 +124,4 @@ async def cancle_problem(call: CallbackQuery, state: FSMContext):
     await state.clear()
     await call.answer('Ваше сообщение не было отправленно')
 
-    text = 'Если нужна помощь, то нажми кнопку <i>"Создать тикет"</i>\n' \
-           'и наши админы ответя тебе в течении 24-х часов'
-
-    await call.message.edit_caption(caption=text, reply_markup=tikcket_inline_kb())
+    await call.message.delete()
