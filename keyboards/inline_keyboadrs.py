@@ -1,5 +1,7 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 from create_bot import admins
+
 
 # стартовая клава
 def start_inline_kb(telegram_id: int):
@@ -69,3 +71,35 @@ def accept_or_cancle_kb():
     keyboard = InlineKeyboardMarkup(inline_keyboard=kb_list)
 
     return keyboard
+
+def admin_panel_kb():
+    kb_list = [
+        [InlineKeyboardButton(text='🎫 Тикеты', callback_data='adm_tickets'), InlineKeyboardButton(text='🧑‍💻 Логи', callback_data='adm_logs')],
+        [InlineKeyboardButton(text='⬅️ Назад', callback_data='backtomenu'), InlineKeyboardButton(text='💣 Темки', callback_data='adm_themes')]
+    ]
+
+    return InlineKeyboardMarkup(inline_keyboard=kb_list)
+
+def pick_tickets_type_kb():
+    kb_list = [
+        [InlineKeyboardButton(text='🤖 Бот', callback_data='type_bot'), InlineKeyboardButton(text='💸 Темка', callback_data='type_theme')],
+        [InlineKeyboardButton(text='👤 Пользователь', callback_data='type_user'), InlineKeyboardButton(text='💬 Отзыв', callback_data='type_feedback')],
+        [InlineKeyboardButton(text='⬅️ Назад', callback_data='admin')]
+    ]
+
+    return InlineKeyboardMarkup(inline_keyboard=kb_list)
+
+
+# def generic_tickets_kb(type: list):
+
+
+#     tickets = generic_type(type)
+#     tickets[]
+
+#     keyboard = InlineKeyboardBuilder()
+
+
+#     return keyboard
+
+
+        
