@@ -3,7 +3,9 @@ from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_applicati
 from aiohttp import web
 from config import settings
 from create_bot import bot, dp
-from handlers.users import user_router
+from handlers.user_router import user_router
+from handlers.admin_router import admin_router
+from handlers.ticket_router import ticket_router
 from create_bot import set_commands
 from aiogram.types import BotCommand, BotCommandScopeDefault
 from create_bot import admins
@@ -42,8 +44,10 @@ async def on_shutdown():
 # Главная функция для запуска бота
 # Основная функция, которая запускает приложение
 def main() -> None:
-    # Подключаем маршрутизатор (роутер) для обработки сообщений
+    # Подключаем маршрутизаторы (роутер) для обработки сообщений
     dp.include_router(user_router)
+    dp.include_router(admin_router)
+    dp.include_router(ticket_router)
 
     # Регистрируем функцию, которая будет вызвана при старте бота
     dp.startup.register(on_startup)
